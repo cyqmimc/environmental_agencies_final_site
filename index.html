@@ -12,11 +12,30 @@
 </head>
 <body class="bg-gray-50">
 <div id="app" class="max-w-7xl mx-auto p-4">
+
   <h1 class="text-3xl font-bold mb-2">Global Environmental Agencies</h1>
   <p class="text-gray-600 mb-6">当前显示 {{ filteredCountries.length }} / {{ countries.length }} 个国家和地区</p>
 
+  <!-- 搜索和筛选 -->
+  <div class="flex flex-col md:flex-row gap-4 mb-6">
+    <input v-model="search" type="text" placeholder="搜索国家或环保部门..." class="border p-2 rounded w-full">
+    <select v-model="regionFilter" class="border p-2 rounded w-full">
+      <option value="">全部地区</option>
+      <option value="亚洲">亚洲</option>
+      <option value="欧洲">欧洲</option>
+      <option value="非洲">非洲</option>
+      <option value="美洲">美洲</option>
+      <option value="大洋洲">大洋洲</option>
+      <option value="加勒比">加勒比</option>
+      <option value="南极洲">南极洲</option>
+    </select>
+    <button @click="clearFilters" class="border p-2 rounded bg-gray-200 hover:bg-gray-300 w-full md:w-auto">清空</button>
+  </div>
+
+  <!-- 世界地图 -->
   <div id="world-map" class="w-full h-96 my-8 rounded shadow"></div>
 
+  <!-- 表格展示 -->
   <div v-if="paginatedCountries.length" class="overflow-x-auto bg-white rounded shadow">
     <table class="min-w-full text-left">
       <thead class="bg-gray-100">
@@ -41,6 +60,7 @@
       </tbody>
     </table>
 
+    <!-- 分页 -->
     <div class="flex flex-wrap justify-center items-center gap-2 mt-4">
       <button @click="currentPage--" :disabled="currentPage === 1" class="px-3 py-1 border rounded-full hover:bg-gray-100 disabled:opacity-50">上一页</button>
       <span class="px-4 py-1 border rounded-full bg-gray-100">第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
@@ -52,6 +72,7 @@
 
   <div v-else class="text-center text-gray-500 p-8">未找到匹配的国家或环保机构。</div>
 
+  <!-- 弹窗Modal -->
   <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded shadow max-w-lg w-full relative">
       <button @click="showModal = false" class="absolute top-2 right-2 text-gray-400 hover:text-black">✕</button>
@@ -131,16 +152,6 @@ createApp({
         countryLinkMap[item.country_cn] = item.website;
       });
 
-      const asiaCountries = ['China', 'Japan', 'India'];
-      const europeCountries = ['Germany', 'France', 'United Kingdom'];
-      const africaCountries = ['Nigeria', 'South Africa', 'Egypt'];
-
-      const regions = [
-        ...asiaCountries.map(name => ({ name, itemStyle: { areaColor: '#f87171' } })),
-        ...europeCountries.map(name => ({ name, itemStyle: { areaColor: '#60a5fa' } })),
-        ...africaCountries.map(name => ({ name, itemStyle: { areaColor: '#34d399' } }))
-      ];
-
       const option = {
         tooltip: { trigger: 'item', formatter: '{b}' },
         series: [{
@@ -157,8 +168,10 @@ createApp({
             areaColor: '#e0e0e0',
             borderColor: '#999'
           },
-          emphasis: { label: { show: true } },
-          regions: regions
+          emphasis: {
+            label: { show: true },
+            itemStyle: { areaColor: '#a5d6a7' }
+          }
         }]
       };
       chart.setOption(option);
