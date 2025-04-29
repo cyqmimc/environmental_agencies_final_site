@@ -17,17 +17,11 @@
   <p class="text-gray-600 mb-6">当前显示 {{ filteredCountries.length }} / {{ countries.length }} 个国家和地区</p>
 
   <!-- 搜索和筛选 -->
-  <div class="flex flex-col md:flex-row gap-4 mb-6">
-    <input v-model="search" type="text" placeholder="搜索国家或环保部门..." class="border p-2 rounded w-full">
-    <select v-model="regionFilter" class="border p-2 rounded w-full">
-      <option value="">全部地区</option>
-      <option value="亚洲">亚洲</option>
-      <option value="欧洲">欧洲</option>
-      <option value="非洲">非洲</option>
-      <option value="美洲">美洲</option>
-      <option value="大洋洲">大洋洲</option>
-      <option value="加勒比">加勒比</option>
-      <option value="南极洲">南极洲</option>
+  <div class="flex flex-wrap gap-4 mb-6">
+    <input v-model="search" type="text" placeholder="Search country or agency..." class="border p-2 rounded w-full md:w-1/2">
+    <select v-model="regionFilter" class="border p-2 rounded w-full md:w-1/4">
+      <option value="">All Regions</option>
+      <option v-for="r in regions" :key="r" :value="r">{{ r }}</option>
     </select>
     <button @click="clearFilters" class="border p-2 rounded bg-gray-200 hover:bg-gray-300 w-full md:w-auto">清空</button>
   </div>
