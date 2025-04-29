@@ -2,24 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Global Environmental Agencies</title>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50">
 <div id="app" class="max-w-7xl mx-auto p-4">
-
   <h1 class="text-3xl font-bold mb-2">Global Environmental Agencies</h1>
   <p class="text-gray-600 mb-6">当前显示 {{ filteredCountries.length }} / {{ countries.length }} 个国家和地区</p>
 
-  <!-- 世界地图 -->
   <div id="world-map" class="w-full h-96 my-8 rounded shadow"></div>
 
-  <!-- 搜索和筛选 -->
   <div class="flex flex-wrap gap-4 mb-6">
     <input v-model="search" type="text" placeholder="Search country or agency..." class="border p-2 rounded w-full md:w-1/2">
     <select v-model="regionFilter" class="border p-2 rounded w-full md:w-1/4">
@@ -29,7 +26,6 @@
     <button @click="clearFilters" class="border p-2 rounded bg-gray-200 hover:bg-gray-300 w-full md:w-auto">清空搜索与筛选</button>
   </div>
 
-  <!-- 表格 -->
   <div v-if="paginatedCountries.length" class="overflow-x-auto bg-white rounded shadow">
     <table class="min-w-full text-left">
       <thead class="bg-gray-100">
@@ -54,7 +50,6 @@
       </tbody>
     </table>
 
-    <!-- 分页按钮 -->
     <div class="flex flex-wrap justify-center items-center gap-2 mt-4">
       <button @click="currentPage--" :disabled="currentPage === 1" class="px-3 py-1 border rounded-full hover:bg-gray-100 disabled:opacity-50">上一页</button>
       <span class="px-4 py-1 border rounded-full bg-gray-100">第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
@@ -62,15 +57,10 @@
       <input v-model.number="jumpPage" type="number" min="1" :max="totalPages" placeholder="跳转页" class="border p-1 rounded w-20">
       <button @click="goToPage" class="px-3 py-1 border rounded hover:bg-gray-100">跳转</button>
     </div>
-
   </div>
 
-  <!-- 无结果提示 -->
-  <div v-else class="text-center text-gray-500 p-8">
-    未找到匹配的国家或环保机构。
-  </div>
+  <div v-else class="text-center text-gray-500 p-8">未找到匹配的国家或环保机构。</div>
 
-  <!-- 弹窗 Modal -->
   <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded shadow max-w-lg w-full relative">
       <button @click="showModal = false" class="absolute top-2 right-2 text-gray-400 hover:text-black">✕</button>
@@ -147,6 +137,7 @@ createApp({
       const countryLinkMap = {};
       this.countries.forEach(item => {
         countryLinkMap[item.country_en.toLowerCase()] = item.website;
+        countryLinkMap[item.country_cn] = item.website;
       });
       const option = {
         tooltip: { trigger: 'item', formatter: '{b}' },
@@ -154,9 +145,12 @@ createApp({
       };
       chart.setOption(option);
       chart.on('click', params => {
-        const countryName = params.name.toLowerCase();
-        const link = countryLinkMap[countryName];
+        const name = params.name.toLowerCase();
+        const link = countryLinkMap[name] || countryLinkMap[params.name];
         if (link) window.open(link, '_blank');
+      });
+      window.addEventListener('resize', () => {
+        chart.resize();
       });
     }
   },
